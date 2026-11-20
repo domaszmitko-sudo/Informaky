@@ -30,8 +30,10 @@ button.go{background:var(--accent);border-color:var(--accent);color:#111}
 .menu{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}
 @media(max-width:640px){.menu{grid-template-columns:1fr}}
 .loco{position:relative;width:100%;aspect-ratio:1333/1050;overflow:hidden;border-radius:10px;background:#cfd6dc;margin-bottom:14px}
-.loco img{position:absolute;left:0;top:0;width:100%;display:block}
-.slot{position:absolute;left:53.9%;top:40.86%;width:30.2%;aspect-ratio:104/12;background:#030303;border-radius:1px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.loco{background:#23282d}
+.loco img{position:absolute;left:0;top:0;width:100%;display:block;z-index:2}
+.loco.front .slot{z-index:3}
+.slot{z-index:1;position:absolute;left:53.9%;top:40.86%;width:30.2%;aspect-ratio:104/12;background:#030303;border-radius:1px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
 .slot canvas{width:100%;height:100%;display:block}
 .cap{font-size:.8rem;opacity:.75;margin:0 0 6px}
 .menu button{text-align:left;padding:12px 14px;font-weight:600;line-height:1.3}
@@ -63,6 +65,7 @@ button.go{background:var(--accent);border-color:var(--accent);color:#111}
  <label class="full">Text (cíl) – když se nevejde, sám se rozjede; když se vejde, stojí na místě
   <input id="wtext" value="Chomutov" maxlength="60">
  </label>
+ <label class="full chk"><input type="checkbox" id="wfront"> Panel zobrazit před fotkou (nech vypnuté, až bude okno ve WTB362.png průhledné – panel pak bude vidět za sklem)</label>
  <label>Písmo<select id="wbold"><option value="1">Tučné</option><option value="0">Normální</option></select></label>
  <label>Rychlost posuvu<input id="wspeed" type="number" min="1" max="10" value="5"></label>
  <div class="btns">
@@ -474,7 +477,8 @@ Lukavice v Čechách</textarea>
     var x0=line?Math.max(38,1+lc.length+5):1;
     wt.stat=wcolsToPts(lc,1);
     if(tc.length<=WW-x0-1) wt.stat=wt.stat.concat(wcolsToPts(tc,x0));   /* vejde se → stojí */
-    else wt.scr={pts:wcolsToPts(tc,0),w:tc.length,pos:WW,x0:x0};         /* nevejde se → jede */
+    else wt.scr={pts:wcolsToPts(tc,0),w:tc.length,pos:WW,                /* nevejde se → jede */
+                 x0:line?1+lc.length+3:1};                                /* a zajíždí až těsně k lince */
     wt.on=true;
     try{var o={};WFIELDS.forEach(function(k){o[k]=$(k).value});localStorage.setItem('panelWtb',JSON.stringify(o))}catch(e){}
   }
@@ -636,6 +640,7 @@ Lukavice v Čechách</textarea>
   $('k3').addEventListener('click',function(){setKind('wtb')});
   $('wstart').addEventListener('click',startWtb);
   $('wstop').addEventListener('click',stop);
+  $('wfront').addEventListener('change',function(){$('loco').classList.toggle('front',$('wfront').checked)});
   $('wcolor').addEventListener('change',function(){wt.color=$('wcolor').value});
   $('wbold').addEventListener('change',function(){if(wt.on) startWtb()});
   window.addEventListener('load',function(){resize()});
